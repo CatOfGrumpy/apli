@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>List</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+
+    .container {
+      width: 80%;
+      margin: 20px auto;
+    }
+
+    .list-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr); /* 5 столбцов */
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .list-item {
+      border: 1px solid #ccc;
+      padding: 5px;
+      text-align: center;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .pagination button {
+      padding: 5px 10px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+
+    .add-form {
+      margin-bottom: 20px;
+    }
+
+    .add-form input {
+      padding: 5px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>List</h1>
+
+    <div class="add-form">
+      <input type="text" id="newItemText" placeholder="New item text">
+      <button onclick="addItem()">Add</button>
+    </div>
+
+    <div class="list-container" id="listContainer">
+    </div>
+
+    <div class="pagination" id="pagination">
+    </div>
+  </div>
+
+  <script>
+    let items = [];
+    const itemsPerPage = 20;
+    let currentPage = 1;
+
+    // Функция для генерации данных
+    function generateInitialData() {
+      for (let i = 1; i <= 100; i++) {
+        items.push({ id: i, text: `Item ${i}` });
+      }
+    }
+
+    // Функция для отображения списка
+    function displayList() {
+      const listContainer = document.getElementById("listContainer");
+      listContainer.innerHTML = ""; // Очистка контейнера
+
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const currentPageItems = items.slice(startIndex, endIndex);
+
+      currentPageItems.forEach(item => {
+        const listItem = document.createElement("div");
+        listItem.classList.add("list-item");
+        listItem.textContent = item.text;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = () => deleteItem(item.id);
+
+        listItem.appendChild(deleteButton);
+        listContainer.appendChild(listItem);
+      });
+    }
+
+    // Функция для отображения пагинации
+    function displayPagination() {
+      const paginationContainer = document.getElementById("pagination");
+      paginationContainer.innerHTML = ""; // Очистка
+
+      const pageCount = Math.ceil(items.length / itemsPerPage);
+
+      for (let i = 1; i <= pageCount; i++) {
+        const pageButton = document.createElement("button");
+        pageButton.textContent = i;
+        pageButton.onclick = () => {
+          currentPage = i;
+          displayList();
+        };
+        paginationContainer.appendChild(pageButton);
+      }
+    }
+
+    // Функция для добавления элемента
+    function addItem() {
+      const newItemText = document.getElementById("newItemText").value;
+      if (newItemText.trim() !== "") {
+        const newId = items.length > 0 ? Math.max(...items.map(item => item.id)) + 1 : 1;
+        items.push({ id: newId, text: newItemText });
+        document.getElementById("newItemText").value = ""; // Очистка поля ввода
+        displayList();
+        displayPagination();
+      }
+    }
+
+    // Функция для удаления элемента
+    function deleteItem(id) {
+      items = items.filter(item => item.id !== id);
+      displayList();
+      displayPagination();
+    }
+
+    // Инициализация
+    generateInitialData();
+    displayList();
+    displayPagination();
+  </script>
+</body>
+</html>
